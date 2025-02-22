@@ -58,77 +58,157 @@
 </head>
 
 <body class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-    <div class="container bg-white w-75 border-dark border-1 shadow-lg rounded p-4">
-        <h1>Easy Image Editor</h1>
-        <div class="wrapper d-flex flex-row p-2">
-            <div class="editor-panel p-2">
-                <div class="my-2">Filters</div>
-                <div class="d-flex flex-column gap-2">
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-outline-primary" data-filter="brightness">Brightness</button>
-                        <button class="btn btn-outline-primary" data-filter="saturation">Saturation</button>
+
+    <body class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+        <div class="container bg-white w-75 border-dark border-1 shadow-lg rounded p-4">
+            <h1>Easy Image Editor</h1>
+            <div class="wrapper d-flex flex-row p-2">
+                <div class="editor-panel p-2">
+                    <div class="my-2">Filters</div>
+                    <div class="d-flex flex-column gap-2">
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-outline-primary" data-filter="brightness">Brightness</button>
+                            <button class="btn btn-outline-primary" data-filter="saturation">Saturation</button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-outline-primary" data-filter="inversion">Inversion</button>
+                            <button class="btn btn-outline-primary" data-filter="grayscale">Grayscale</button>
+                        </div>
                     </div>
-                    <div class="btn-group" role="group">
-                        <button class="btn btn-outline-primary" data-filter="inversion">Inversion</button>
-                        <button class="btn btn-outline-primary" data-filter="grayscale">Grayscale</button>
+                    <div class="slider">
+                        <div class="d-flex mt-3 flex-row align-items-center justify-content-between">
+                            <p class="name">Brightness</p>
+                            <p class="value">100%</p>
+                        </div>
+                        <input class="w-100" type="range" id="filterSlider" min="0" max="200" value="100">
+                    </div>
+                    <div class="rotate mt-4">
+                        <div class="title">Flip & Rotate</div>
+                        <div class="btn-group mt-2" role="group">
+                            <button class="btn btn-outline-danger px-4 py-1" id="FlipHBtn"><i
+                                    class="bi bi-arrows-collapse"></i></button>
+                            <button class="btn btn-outline-danger px-4 py-1" id="FlipVBtn"><i
+                                    class="bi bi-arrows-collapse-vertical"></i></button>
+                            <button class="btn btn-outline-danger px-4 py-1" id="RotateRightBtn"><i
+                                    class="bi bi-arrow-clockwise"></i></button>
+                            <button class="btn btn-outline-danger px-4 py-1" id="RotateLeftBtn"><i
+                                    class="bi bi-arrow-counterclockwise"></i></button>
+                        </div>
+                    </div>
+                    <div class="controls d-flex flex-column align-items-center mt-4 gap-3">
+                        <button class="btn btn-outline-primary btn-file">
+                            Choose Image
+                            <input type="file" id="fileInput">
+                        </button>
+                        <div class="d-flex gap-3">
+                            <button class="btn btn-outline-warning px-3 py-2" id="resetBtn">Reset Filters</button>
+                            <button class="btn btn-outline-success px-3 py-2" id="saveBtn">Save Image</button>
+                        </div>
                     </div>
                 </div>
-                <div class="slider">
-                    <div class="d-flex mt-3 flex-row align-items-center justify-content-between">
-                        <p class="name">Brightness</p>
-                        <p class="value">100%</p>
-                    </div>
-                    <input class="w-100" type="range" id="filterSlider" min="0" max="200" value="100">
+                <div class="preview-img ms-5">
+                    <img src="image-placeholder.svg" class="img-fluid" alt="" id="previewImg">
                 </div>
-                <div class="rotate mt-4">
-                    <div class="title">Flip & Rotate</div>
-                    <div class="btn-group mt-2" role="group">
-                        <button class="btn btn-outline-danger px-4 py-1" id="FlipHBtn"><i
-                                class="bi bi-arrows-collapse"></i></button>
-                        <button class="btn btn-outline-danger px-4 py-1" id="FlipVBtn"><i
-                                class="bi bi-arrows-collapse-vertical"></i></button>
-                        <button class="btn btn-outline-danger px-4 py-1" id="RotateRightBtn"><i
-                                class="bi bi-arrow-clockwise"></i></button>
-                        <button class="btn btn-outline-danger px-4 py-1" id="RotateLeftBtn"><i
-                                class="bi bi-arrow-counterclockwise"></i></button>
-                    </div>
-                </div>
-            </div>
-            <div class="preview-img ms-5">
-                <img src="image-placeholder.svg" class="img-fluid" alt="" id="previewImg">
             </div>
         </div>
-
-        <div class="controls d-flex flex-column align-items-center mt-4 gap-3">
-            <button class="btn btn-outline-primary btn-file">
-                Choose Image
-                <input type="file" id="fileInput">
-            </button>
-            <div class="d-flex gap-3">
-                <button class="btn btn-outline-warning px-3 py-2" id="resetBtn">Reset Filters</button>
-                <button class="btn btn-outline-success px-3 py-2" id="saveBtn">Save Image</button>
-            </div>
-        </div>
-    </div>
-
+    </body>
     <script>
+
         const previewImg = document.getElementById('previewImg');
-        const filterName = document.querySelector('.name');
-        const filterValue = document.querySelector('.value');
-        const filterSlider = document.getElementById('filterSlider');
         const fileInput = document.getElementById('fileInput');
         const saveBtn = document.getElementById('saveBtn');
         const resetBtn = document.getElementById('resetBtn');
+        const filterSlider = document.getElementById('filterSlider');
+        const filterName = document.querySelector('.filter-name');
+        const filterValue = document.querySelector('.filter-value');
 
         let filters = { brightness: 100, saturation: 100, inversion: 0, grayscale: 0 };
         let rotate = 0, flipH = 1, flipV = 1;
-        let imageLoaded = false; // Track if an image is chosen
+        let imageLoaded = false;
+        const placeholderSrc = "placeholder_png.png"; // Default placeholder
 
+        // Function to apply filters only if an image is uploaded
         const applyFilters = () => {
             if (!imageLoaded) return;
             previewImg.style.filter = `brightness(${filters.brightness}%) saturate(${filters.saturation}%) invert(${filters.inversion}%) grayscale(${filters.grayscale}%)`;
             previewImg.style.transform = `rotate(${rotate}deg) scale(${flipH}, ${flipV})`;
         };
+
+        // Load Image & Allow Editing Only When an Image is Chosen
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                previewImg.src = reader.result;
+                imageLoaded = true;
+                applyFilters();
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Prevent Filters & Editing if No Image is Chosen
+        filterSlider.addEventListener('input', () => {
+            if (!imageLoaded) {
+                alert("Please choose an image first!");
+                return;
+            }
+            const value = filterSlider.value;
+            const activeFilter = filterName.textContent.toLowerCase();
+            filters[activeFilter] = value;
+            filterValue.textContent = `${value}%`;
+            applyFilters();
+        });
+
+        // Reset Filters & Restore Placeholder If No Image Selected
+        resetBtn.addEventListener('click', () => {
+            if (!imageLoaded) return;
+
+            filters = { brightness: 100, saturation: 100, inversion: 0, grayscale: 0 };
+            rotate = 0;
+            flipH = 1;
+            flipV = 1;
+
+            filterSlider.value = filters.brightness;
+            filterValue.textContent = `100%`;
+
+            applyFilters();
+        });
+
+        // Prevent Saving the Placeholder Image
+        saveBtn.addEventListener('click', () => {
+            if (!imageLoaded) {
+                alert("Please choose an image first!");
+                return;
+            }
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+
+            img.src = previewImg.src;
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.filter = `brightness(${filters.brightness}%) saturate(${filters.saturation}%) invert(${filters.inversion}%) grayscale(${filters.grayscale}%)`;
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate((rotate * Math.PI) / 180);
+                ctx.scale(flipH, flipV);
+                ctx.drawImage(img, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL("image/png");
+                link.download = "edited-image.png";
+                link.click();
+            };
+        });
+
+        // Set Placeholder as Default When No Image is Chosen
+        window.onload = () => {
+            previewImg.src = placeholderSrc;
+            imageLoaded = false;
+        };
+
 
         // Prevent filter changes before an image is selected
         document.querySelectorAll('[data-filter]').forEach(btn => {
