@@ -163,15 +163,26 @@
         // Reset Filters
         resetBtn.addEventListener('click', () => {
             if (!imageLoaded) return;
-            filters = { brightness: 100, saturation: 100, inversion: 0, grayscale: 0 };
-            rotate = 0; flipH = 1; flipV = 1;
 
-            filterName.textContent = "Brightness"; // Reset UI filter name
-            filterSlider.value = 100;
-            filterValue.textContent = "100%";
+            // Reset all filters
+            filters = { brightness: 100, saturation: 100, inversion: 0, grayscale: 0 };
+            rotate = 0;
+            flipH = 1;
+            flipV = 1;
+
+            // Get currently selected filter
+            const activeFilter = filterName.textContent.toLowerCase();
+
+            // Ensure the slider resets to the correct filter's default value
+            if (filters[activeFilter] !== undefined) {
+                filterSlider.value = filters[activeFilter];
+                filterValue.textContent = `${filters[activeFilter]}%`;
+            }
 
             applyFilters();
+            applyTransform();
         });
+
 
         // Load Image
         fileInput.addEventListener('change', () => {
