@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Editor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+
+        .container {
+            margin: 10%;
+        }
+
+        .btn-file {
+            position: relative;
+            overflow: hidden;
+            width: 230px;
+        }
+
+        .btn-file input[type="file"] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            font-size: 100px;
+            text-align: right;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .preview-img img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+    <script>
+        window.onload = function () {
+            if (window.innerWidth < 768) {
+                alert("For the best experience, please open this website on a laptop or tablet.");
+            }
+        };
+    </script>
+</head>
+
+<body class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+    <div class="container bg-white w-75 border-dark border-1 shadow-lg rounded p-4">
+        <h1>Easy Image Editor</h1>
+        <div class="wrapper d-flex flex-row p-2">
+            <div class="editor-panel p-2">
+                <div class="my-2">Filters</div>
+                <div class="d-flex flex-column gap-2">
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-outline-primary" data-filter="brightness">Brightness</button>
+                        <button class="btn btn-outline-primary" data-filter="saturation">Saturation</button>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-outline-primary" data-filter="inversion">Inversion</button>
+                        <button class="btn btn-outline-primary" data-filter="grayscale">Grayscale</button>
+                    </div>
+                </div>
+                <div class="slider">
+                    <div class="d-flex mt-3 flex-row align-items-center justify-content-between">
+                        <p class="name">Brightness</p>
+                        <p class="value">100%</p>
+                    </div>
+                    <input class="w-100" type="range" id="filterSlider" min="0" max="200" value="100">
+                </div>
+                <div class="rotate mt-4">
+                    <div class="title">Flip & Rotate</div>
+                    <div class="btn-group mt-2" role="group">
+                        <button class="btn btn-outline-danger px-4 py-1" id="FlipHBtn"><i
+                                class="bi bi-arrows-collapse"></i></button>
+                        <button class="btn btn-outline-danger px-4 py-1" id="FlipVBtn"><i
+                                class="bi bi-arrows-collapse-vertical"></i></button>
+                        <button class="btn btn-outline-danger px-4 py-1" id="RotateRightBtn"><i
+                                class="bi bi-arrow-clockwise"></i></button>
+                        <button class="btn btn-outline-danger px-4 py-1" id="RotateLeftBtn"><i
+                                class="bi bi-arrow-counterclockwise"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="preview-img ms-5">
+                <img src="image-placeholder.svg" class="img-fluid" alt="" id="previewImg">
+            </div>
+        </div>
+
+        <div class="controls d-flex flex-column align-items-center mt-4 gap-3">
+            <button class="btn btn-outline-primary btn-file">
+                Choose Image
+                <input type="file" id="fileInput">
+            </button>
+            <div class="d-flex gap-3">
+                <button class="btn btn-outline-warning px-3 py-2" id="resetBtn">Reset Filters</button>
+                <button class="btn btn-outline-success px-3 py-2" id="saveBtn">Save Image</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const previewImg = document.getElementById('previewImg');
+        const filterName = document.querySelector('.name');
+        const filterValue = document.querySelector('.value');
+        const filterSlider = document.getElementById('filterSlider');
+        const fileInput = document.getElementById('fileInput');
+        const saveBtn = document.getElementById('saveBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        let filters = { brightness: 100, saturation: 100, inversion: 0, grayscale: 0 };
+        let rotate = 0, flipH = 1, flipV = 1;
+        let imageLoaded = false; // Track if an image is chosen
+
+        const applyFilters = () => {
+            if (!imageLoaded) return;
+            previewImg.style.filter = `brightness(${filters.brightness}%) saturate(${filters.saturation}%) invert(${filters.inversion}%) grayscale(${filters.grayscale}%)`;
+            previewImg.style.transform = `rotate(${rotate}deg) scale(${flipH}, ${flipV})`;
+        };
+
+        // Prevent filter changes before an image is selected
+        document.querySelectorAll('[data-filter]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                if (!imageLoaded) {
+                    alert("Please choose an image first!");
+                    return;
+                }
+                const filterType = this.dataset.filter;
+                filterName.textContent = filterType.charAt(0).toUpperCase() + filterType.slice(1);
+                filterSlider.value = filters[filterType];
+                filterValue.textContent = `${filters[filterType]}%`;
+                filterSlider.max = (filterType === 'inversion' || filterType === 'grayscale') ? 100 : 200;
+            });
+        });
+
+        // Update filter values dynamically
+        filterSlider.addEventListener('input', () => {
+            if (!imageLoaded) return;
+            const activeFilter = filterName.textContent.toLowerCase();
+            filters[activeFilter] = filterSlider.value;
+            filterValue.textContent = `${filterSlider.value}%`;
+            applyFilters();
+        });
+
+        // Flip & Rotate Functions
+        document.getElementById('FlipHBtn').addEventListener('click', () => { if (imageLoaded) { flipH *= -1; applyFilters(); } });
+        document.getElementById('FlipVBtn').addEventListener('click', () => { if (imageLoaded) { flipV *= -1; applyFilters(); } });
+        document.getElementById('RotateRightBtn').addEventListener('click', () => { if (imageLoaded) { rotate += 90; applyFilters(); } });
+        document.getElementById('RotateLeftBtn').addEventListener('click', () => { if (imageLoaded) { rotate -= 90; applyFilters(); } });
+
+        // Reset Filters
+        resetBtn.addEventListener('click', () => {
+            if (!imageLoaded) return;
+            filters = { brightness: 100, saturation: 100, inversion: 0, grayscale: 0 };
+            rotate = 0; flipH = 1; flipV = 1;
+
+            filterName.textContent = "Brightness"; // Reset UI filter name
+            filterSlider.value = 100;
+            filterValue.textContent = "100%";
+
+            applyFilters();
+        });
+
+        // Load Image
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                previewImg.src = reader.result;
+                imageLoaded = true;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Save Image
+        saveBtn.addEventListener('click', () => {
+            if (!imageLoaded) {
+                alert("Please choose an image first!");
+                return;
+            }
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+
+            img.src = previewImg.src;
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+
+                // Apply transformations
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate((rotate * Math.PI) / 180);
+                ctx.scale(flipH, flipV);
+                ctx.filter = `brightness(${filters.brightness}%) saturate(${filters.saturation}%) invert(${filters.inversion}%) grayscale(${filters.grayscale}%)`;
+
+                // Draw the image at the center
+                ctx.drawImage(img, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL("image/png");
+                link.download = "edited-image.png";
+                link.click();
+            };
+        });
+
+    </script>
+</body>
+
+</html>
