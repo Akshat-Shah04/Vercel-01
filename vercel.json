@@ -1,0 +1,8 @@
+{
+    "rewrites": [
+        {
+            "source": "/",
+            "destination": "/Image Effect/imageFilter.html"
+        }
+    ]
+}
