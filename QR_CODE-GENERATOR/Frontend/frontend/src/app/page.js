@@ -18,6 +18,7 @@ export default function Home() {
     setError(null);
     try {
       const response = await axios.post(apiUrl, { data: text });
+      console.log('QR code generated:', response.data);
       setQrCode(`data:image/png;base64,${response.data.image}`);
       setShareUrl(response.data.url);
     } catch (err) {
