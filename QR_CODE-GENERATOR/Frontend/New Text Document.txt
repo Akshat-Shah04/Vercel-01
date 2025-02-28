@@ -1,0 +1,49 @@
+# QR Code Generator Web App - Development Plan
+
+## ✅ Phase 1: Core Development (MVP)
+🚀 **Goal:** Get a fully functional app with QR code generation & user authentication.
+
+### 1️⃣ Backend (Django + DRF) – Hosted on Render
+- [ ] Set up Django project & DRF.
+- [ ] Create API for generating & customizing QR codes.
+- [ ] Implement SQLite (Local) → PostgreSQL (Render).
+- [ ] Add basic authentication (signup, login, logout).
+- [ ] Allow saving QR codes in the database (for premium users).
+
+### 2️⃣ Frontend (Next.js) – Hosted on Vercel
+- [ ] Setup Next.js project.
+- [ ] Create a basic UI for QR code generation.
+- [ ] Connect frontend with Django backend API.
+- [ ] Implement authentication (user login/signup).
+
+---
+
+## 🛠️ Phase 2: Monetization Setup
+🔹 **Goal:** Add payment integration & premium features.
+
+- [ ] Limit free-tier users to **5 QR codes/day**.
+- [ ] Implement a **points system** (users buy or earn points).
+- [ ] Integrate **payment gateway** (Stripe, Razorpay, PayPal, GPay, or Paytm).
+- [ ] Store QR code analytics (only for premium users).
+- [ ] Add a pricing page explaining free vs. premium benefits.
+
+---
+
+## 📊 Phase 3: Advanced Features
+🔹 **Goal:** Make the app more interactive & feature-rich.
+
+- [ ] Advanced **QR Code Customization** (colors, logo embedding).
+- [ ] **QR Code Tracking & Analytics** (track scans, locations, device type).
+- [ ] Referral system to **earn points for free**.
+- [ ] Add user **dashboard** to manage saved QR codes & view analytics.
+
+---
+
+## 📌 Next Steps – Where to Start?
+1️⃣ **Set up the Django backend first** (basic API for QR codes).
+2️⃣ **Then move to the Next.js frontend** to connect with the backend.
+3️⃣ **Later, add payments & premium features**.
+
+---
+
+🚀 **Let's get started!**
