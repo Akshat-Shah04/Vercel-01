@@ -80,17 +80,7 @@ export default function Home() {
                   </button>
                 </div>
               )}
-              {qrCode && (
-                <div className="my-3">
-                  <p className="classic-label">Share this QR Code:</p>
-                  <input
-                    type="text"
-                    value={shareUrl} // Use shareUrl state
-                    className="form-control classic-input"
-                    readOnly
-                  />
-                </div>
-              )}
+
             </div>
           ) : null}
         </div>
