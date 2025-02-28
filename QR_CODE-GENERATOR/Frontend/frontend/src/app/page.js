@@ -80,7 +80,7 @@ export default function Home() {
                 </div>
               )}
               {qrCode && (
-                <div className="mt-3">
+                <div className="my-3">
                   <p className="classic-label">Share this QR Code:</p>
                   <input
                     type="text"
