@@ -9,6 +9,7 @@ export default function Home() {
   const [qrCode, setQrCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [shareUrl, setShareUrl] = useState('');
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -18,6 +19,7 @@ export default function Home() {
     try {
       const response = await axios.post(apiUrl, { data: text });
       setQrCode(`data:image/png;base64,${response.data.image}`);
+      setShareUrl(response.data.url);
     } catch (err) {
       console.error('Error generating QR code:', err);
       if (err.response) {
@@ -62,7 +64,7 @@ export default function Home() {
           </div>
           <div className="d-grid gap-2">
             <button className="btn modern-button" onClick={generateQRCode} disabled={isLoading}>
-              {isLoading ? 'Generating...' : 'Generate QR Code'}
+              {isLoading ? 'Generating QR Code...' : 'Generate QR Code'}
             </button>
           </div>
           {error && <div className="alert alert-danger mt-3">{error}</div>}
@@ -82,7 +84,7 @@ export default function Home() {
                   <p className="classic-label">Share this QR Code:</p>
                   <input
                     type="text"
-                    value={window.location.href}
+                    value={shareUrl} // Use shareUrl state
                     className="form-control classic-input"
                     readOnly
                   />
