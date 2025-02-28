@@ -10,14 +10,13 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
   const generateQRCode = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await axios.post(
-        'https://qr-code-xwa2.onrender.com/api/qr/generate/',
-        { data: text }
-      );
+      const response = await axios.post(apiUrl, { data: text });
       setQrCode(`data:image/png;base64,${response.data.image}`);
     } catch (err) {
       console.error('Error generating QR code:', err);
