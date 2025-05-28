@@ -2,29 +2,27 @@
 import { useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './page.css'; // Import custom CSS
+import './page.css';
 
 export default function Home() {
   const [text, setText] = useState('');
-  const [qrCode, setQrCode] = useState('');
+  const [qrCodeUrl, setQrCodeUrl] = useState(''); // rename to qrCodeUrl for clarity
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [shareUrl, setShareUrl] = useState('');
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const generateQRCode = async () => {
-    setIsLoading(true);
+    setIsLoading(true); 
     setError(null);
     try {
       const response = await axios.post(apiUrl, { data: text });
       console.log('QR code generated:', response.data);
-      setQrCode(`data:image/png;base64,${response.data.image}`);
-      setShareUrl(response.data.url);
+      setQrCodeUrl(response.data.image_url);  // now use image_url from backend
     } catch (err) {
       console.error('Error generating QR code:', err);
       if (err.response) {
-        setError(`Failed to generate QR code: ${err.response.status} - ${err.response.data}`);
+        setError(`Failed to generate QR code: ${err.response.status} - ${JSON.stringify(err.response.data)}`);
       } else if (err.request) {
         setError('Network error. Please check your connection.');
       } else {
@@ -36,9 +34,10 @@ export default function Home() {
   };
 
   const downloadQRCode = () => {
-    if (qrCode) {
+    if (qrCodeUrl) {
+      // Create a temporary link to trigger download
       const link = document.createElement('a');
-      link.href = qrCode;
+      link.href = qrCodeUrl;
       link.download = 'qrcode.png';
       document.body.appendChild(link);
       link.click();
@@ -64,23 +63,19 @@ export default function Home() {
             />
           </div>
           <div className="d-grid gap-2">
-            <button className="btn modern-button" onClick={generateQRCode} disabled={isLoading}>
+            <button className="btn modern-button" onClick={generateQRCode} disabled={isLoading || !text.trim()}>
               {isLoading ? 'Generating QR Code...' : 'Generate QR Code'}
             </button>
           </div>
           {error && <div className="alert alert-danger mt-3">{error}</div>}
-          {qrCode || isLoading ? (
+          {qrCodeUrl ? (
             <div className="mt-4 text-center qr-code-container">
-              {isLoading && <div className="spinner"></div>}
-              {qrCode && <img src={qrCode} alt="QR Code" className="img-fluid" />}
-              {qrCode && (
-                <div className="d-grid gap-2 mt-2">
-                  <button className="btn modern-button" onClick={downloadQRCode}>
-                    Download QR Code
-                  </button>
-                </div>
-              )}
-
+              <img src={qrCodeUrl} alt="QR Code" className="img-fluid" />
+              <div className="d-grid gap-2 mt-2">
+                <button className="btn modern-button" onClick={downloadQRCode}>
+                  Download QR Code
+                </button>
+              </div>
             </div>
           ) : null}
         </div>
