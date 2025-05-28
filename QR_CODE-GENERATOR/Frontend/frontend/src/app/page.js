@@ -6,19 +6,19 @@ import './page.css';
 
 export default function Home() {
   const [text, setText] = useState('');
-  const [qrCodeUrl, setQrCodeUrl] = useState(''); // rename to qrCodeUrl for clarity
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const generateQRCode = async () => {
-    setIsLoading(true); 
+    setIsLoading(true);
     setError(null);
     try {
       const response = await axios.post(apiUrl, { data: text });
       console.log('QR code generated:', response.data);
-      setQrCodeUrl(response.data.image_url);  // now use image_url from backend
+      setQrCodeUrl(response.data.share_url);  // ✅ match with Django backend
     } catch (err) {
       console.error('Error generating QR code:', err);
       if (err.response) {
@@ -35,7 +35,6 @@ export default function Home() {
 
   const downloadQRCode = () => {
     if (qrCodeUrl) {
-      // Create a temporary link to trigger download
       const link = document.createElement('a');
       link.href = qrCodeUrl;
       link.download = 'qrcode.png';
