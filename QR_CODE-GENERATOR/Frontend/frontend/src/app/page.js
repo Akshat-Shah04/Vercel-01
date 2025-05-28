@@ -17,10 +17,8 @@ export default function Home() {
     setError(null);
     try {
       const response = await axios.post(apiUrl, { data: text });
-      console.log('QR code generated:', response.data);
-      setQrCodeUrl(response.data.share_url);  // ✅ match with Django backend
+      setQrCodeUrl(response.data.share_url);
     } catch (err) {
-      console.error('Error generating QR code:', err);
       if (err.response) {
         setError(`Failed to generate QR code: ${err.response.status} - ${JSON.stringify(err.response.data)}`);
       } else if (err.request) {
@@ -33,14 +31,28 @@ export default function Home() {
     }
   };
 
-  const downloadQRCode = () => {
-    if (qrCodeUrl) {
+  const downloadQRCodeAsFile = async () => {
+    if (!qrCodeUrl) return;
+
+    try {
+      const response = await axios.get(qrCodeUrl, {
+        responseType: 'blob',
+      });
+
+      const blob = new Blob([response.data], { type: 'image/png' });
+      const url = window.URL.createObjectURL(blob);
+
       const link = document.createElement('a');
-      link.href = qrCodeUrl;
+      link.href = url;
       link.download = 'qrcode.png';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Download failed:', err);
+      setError('Failed to download QR code image.');
     }
   };
 
@@ -49,6 +61,7 @@ export default function Home() {
       <div className="row justify-content-center">
         <div className="col-md-8">
           <h1 className="text-center mb-4 modern-title">QR Code Generator</h1>
+
           <div className="mb-3">
             <label htmlFor="qrText" className="form-label classic-label">
               Enter Text for QR Code
@@ -61,22 +74,38 @@ export default function Home() {
               onChange={(e) => setText(e.target.value)}
             />
           </div>
+
           <div className="d-grid gap-2">
-            <button className="btn modern-button" onClick={generateQRCode} disabled={isLoading || !text.trim()}>
+            <button
+              className="btn modern-button"
+              onClick={generateQRCode}
+              disabled={isLoading || !text.trim()}
+            >
               {isLoading ? 'Generating QR Code...' : 'Generate QR Code'}
             </button>
           </div>
+
           {error && <div className="alert alert-danger mt-3">{error}</div>}
-          {qrCodeUrl ? (
+
+          {qrCodeUrl && (
             <div className="mt-4 text-center qr-code-container">
               <img src={qrCodeUrl} alt="QR Code" className="img-fluid" />
-              <div className="d-grid gap-2 mt-2">
-                <button className="btn modern-button" onClick={downloadQRCode}>
-                  Download QR Code
+              <div className="d-grid gap-2 mt-3">
+                <button
+                  className="btn btn-outline-primary"
+                  onClick={() => window.open(qrCodeUrl, '_blank')}
+                >
+                  View in New Tab
+                </button>
+                <button
+                  className="btn btn-success"
+                  onClick={downloadQRCodeAsFile}
+                >
+                  Download as File
                 </button>
               </div>
             </div>
-          ) : null}
+          )}
         </div>
       </div>
     </div>
