@@ -15,9 +15,10 @@ export default function Home() {
   const generateQRCode = async () => {
     setIsLoading(true);
     setError(null);
+    setQrCodeUrl('');
     try {
       const response = await axios.post(apiUrl, { data: text });
-      setQrCodeUrl(response.data.share_url);
+      setQrCodeUrl(response.data.share_url); // URL from backend
     } catch (err) {
       if (err.response) {
         setError(`Failed to generate QR code: ${err.response.status} - ${JSON.stringify(err.response.data)}`);
@@ -31,15 +32,13 @@ export default function Home() {
     }
   };
 
-  const downloadQRCodeAsFile = async () => {
+  const downloadQRCode = async () => {
     if (!qrCodeUrl) return;
 
     try {
-      const response = await axios.get(qrCodeUrl, {
-        responseType: 'blob',
-      });
-
-      const blob = new Blob([response.data], { type: 'image/png' });
+      const response = await fetch(qrCodeUrl, { mode: 'cors' });
+      if (!response.ok) throw new Error('Network response was not ok');
+      const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
 
       const link = document.createElement('a');
@@ -48,11 +47,10 @@ export default function Home() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error('Download failed:', err);
-      setError('Failed to download QR code image.');
+      console.error('Error downloading QR code:', err);
+      setError('Download failed. Please try again.');
     }
   };
 
@@ -61,7 +59,6 @@ export default function Home() {
       <div className="row justify-content-center">
         <div className="col-md-8">
           <h1 className="text-center mb-4 modern-title">QR Code Generator</h1>
-
           <div className="mb-3">
             <label htmlFor="qrText" className="form-label classic-label">
               Enter Text for QR Code
@@ -72,9 +69,9 @@ export default function Home() {
               id="qrText"
               value={text}
               onChange={(e) => setText(e.target.value)}
+              disabled={isLoading}
             />
           </div>
-
           <div className="d-grid gap-2">
             <button
               className="btn modern-button"
@@ -84,24 +81,13 @@ export default function Home() {
               {isLoading ? 'Generating QR Code...' : 'Generate QR Code'}
             </button>
           </div>
-
           {error && <div className="alert alert-danger mt-3">{error}</div>}
-
           {qrCodeUrl && (
             <div className="mt-4 text-center qr-code-container">
               <img src={qrCodeUrl} alt="QR Code" className="img-fluid" />
-              <div className="d-grid gap-2 mt-3">
-                <button
-                  className="btn btn-outline-primary"
-                  onClick={() => window.open(qrCodeUrl, '_blank')}
-                >
-                  View in New Tab
-                </button>
-                <button
-                  className="btn btn-success"
-                  onClick={downloadQRCodeAsFile}
-                >
-                  Download as File
+              <div className="d-grid gap-2 mt-2">
+                <button className="btn modern-button" onClick={downloadQRCode}>
+                  Download QR Code
                 </button>
               </div>
             </div>
